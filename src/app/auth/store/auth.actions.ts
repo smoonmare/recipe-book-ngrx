@@ -1,16 +1,26 @@
 import { createAction, props } from '@ngrx/store';
-import { User } from '../user.model';
 
 export enum ActionTypes {
+  LoginStart = '[Auth Component] LOGIN_START',
   Login = '[Auth Component] LOGIN',
-  LogOut = '[Auth Component] LOGOUT'
+  Logout = '[Auth Component] LOGOUT'
 }
 
-export const login = createAction(
-  ActionTypes.Login,
-  props<{user: User}>()
+export const loginStart = createAction(
+  ActionTypes.LoginStart,
+  props<{email: string, password: string}>()
 );
 
+export const login = createAction(
+    ActionTypes.Login,
+    props<{
+      email: string;
+      userId: string;
+      token: string;
+      expDate: Date;
+    }>()
+  );
+
 export const logout = createAction(
-  ActionTypes.LogOut
+  ActionTypes.Logout
 )

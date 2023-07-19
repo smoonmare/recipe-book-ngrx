@@ -1,4 +1,7 @@
 import { Component, ComponentFactoryResolver, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthAction from './store/auth.actions';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { NgForm } from '@angular/forms';
 import { AuthResponseData, AuthService } from './auth.service';
@@ -22,6 +25,7 @@ export class AuthComponent implements OnInit {
   // error = '';
 
   constructor(
+    private store: Store<fromApp.AppState>,
     private authService: AuthService,
     private router: Router,
     private componentFactoryResolver: ComponentFactoryResolver
@@ -47,7 +51,8 @@ export class AuthComponent implements OnInit {
 
     this.isLoading = true;
     if (this.isLoginModeOn) {
-      authObs = this.authService.login(email, password);
+      // authObs = this.authService.login(email, password);
+      this.store.dispatch(AuthAction.loginStart({email: email, password: password}));
     } else {
       authObs = this.authService.signUp(email, password);
     }
