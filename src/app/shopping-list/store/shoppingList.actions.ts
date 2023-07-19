@@ -1,14 +1,11 @@
-import { Action, createAction, props } from "@ngrx/store";
+import { createAction, props } from "@ngrx/store";
+import { Ingredient } from "src/app/shared/ingredient.interface";
 
 export enum ActionTypes {
-  Add = '[ShoppingList Component] ADD_INGREDIENT'
+  AddIngredient = '[ShoppingList Component] ADD_INGREDIENT'
 }
 
-export class AddIngredient implements Action {
-  readonly type = ActionTypes.Add;
-}
-
-// export const add = createAction(
-//   ActionTypes.AddIngredient,
-//   props<{}>()
-// );
+export const add = createAction(
+  ActionTypes.AddIngredient,
+  props<{ingredient: Ingredient}>()
+);
