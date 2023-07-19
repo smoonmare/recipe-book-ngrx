@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/internal/Subject';
 import { Recipe } from './recipe.interface';
 import { Ingredient } from '../shared/ingredient.interface';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
-import { addMultiple } from '../shopping-list/store/shoppingList.actions';
+import { addMultipleIngs } from '../shopping-list/store/shoppingList.actions';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class RecipeService {
 
   addIngredientsToList(ingredients: Ingredient[]) {
     // this.shoppingService.addIngredients(ingredients);
-    this.store.dispatch(addMultiple({ingredients: ingredients}));
+    this.store.dispatch(addMultipleIngs({ingredients: ingredients}));
   }
 
   addRecipe(recipe: Recipe) {

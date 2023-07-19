@@ -16,9 +16,23 @@ export const initialState: Ingredient[] = [
 export const shoppingListReducer = createReducer(
   initialState,
   on(
-    shoppingListActions.add, (state, { name, amount }) => ([...state, {name: name, amount: amount}])
+    shoppingListActions.addIng, (state, { ingredient }) => ([...state, ingredient])
   ),
   on(
-    shoppingListActions.addMultiple, (state, { ingredients }) => ([...state, ...ingredients])
+    shoppingListActions.addMultipleIngs, (state, { ingredients }) => ([...state, ...ingredients])
+  ),
+  on(
+    shoppingListActions.updateIng, (state, { index, newIngredient }) => {
+      const newState = [...state];
+      newState[index] = newIngredient;
+      return newState;
+    }
+  ),
+  on(
+    shoppingListActions.deleteIng, (state, { index }) => {
+      const newState = [...state];
+      newState.splice(index, 1);
+      return newState;
+    }
   )
 )
