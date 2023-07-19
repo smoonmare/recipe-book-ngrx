@@ -1,5 +1,4 @@
-import { Action } from '@ngrx/store';
-import { ActionTypes } from './shoppingList.actions';
+import { ActionTypes, AddIngredient } from './shoppingList.actions';
 import { Ingredient } from 'src/app/shared/ingredient.interface';
 
 const initialState: Ingredient = {
@@ -7,7 +6,7 @@ const initialState: Ingredient = {
   amount:  0
 };
 
-export function shoppingListReducer(state = initialState, action: Action) {
+export function shoppingListReducer(state = initialState, action: AddIngredient) {
   switch(action.type) {
     case ActionTypes.Add:
       return {
