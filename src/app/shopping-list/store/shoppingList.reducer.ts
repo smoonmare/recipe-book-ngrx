@@ -17,5 +17,8 @@ export const shoppingListReducer = createReducer(
   initialState,
   on(
     shoppingListActions.add, (state, { name, amount }) => ([...state, {name: name, amount: amount}])
+  ),
+  on(
+    shoppingListActions.addMultiple, (state, { ingredients }) => ([...state, ...ingredients])
   )
 )
