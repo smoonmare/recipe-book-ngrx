@@ -13,23 +13,9 @@ export const initialState: Ingredient[] = [
   }
 ];
 
-// export function shoppingListReducer(state = initialState, action: AddIngredient) {
-//   switch(action.type) {
-//     case ActionTypes.Add:
-//       return {
-//         ...state,
-//         ingredients: {
-//           ...state, action
-//         }
-//       };
-//     default:
-//       return state;
-//   }
-// }
-
 export const shoppingListReducer = createReducer(
   initialState,
   on(
-    shoppingListActions.add, (state, { ingredient }) => ([{name: ingredient.name, amount: ingredient.amount}])
+    shoppingListActions.add, (state, { name, amount }) => ([...state, {name: name, amount: amount}])
   )
 )

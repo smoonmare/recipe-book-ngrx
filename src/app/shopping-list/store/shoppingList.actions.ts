@@ -7,5 +7,5 @@ export enum ActionTypes {
 
 export const add = createAction(
   ActionTypes.AddIngredient,
-  props<{ingredient: Ingredient}>()
+  props<{name: string, amount: number}>()
 );
