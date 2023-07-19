@@ -6,6 +6,8 @@ export enum ActionTypes {
   AddIngredients = '[ShoppingList Component] ADD_INGREDIENTS',
   UpdateIngredient =  '[ShoppingList Component] UPDATE_INGREDIENT',
   DeleteIngredients = '[ShoppingList Component] DELETE_INGREDIENT',
+  StartEdit = '[Shopping Component] START_EDIT',
+  StopEdit = '[Shopping Component] STOP_EDIT'
 }
 
 export const addIng = createAction(
@@ -18,12 +20,20 @@ export const addMultipleIngs = createAction(
   props<{ingredients: Ingredient[]}>()
 );
 
+export const startEdit = createAction(
+  ActionTypes.StartEdit,
+  props<{index: number}>()
+);
+
+export const stopEdit = createAction(
+  ActionTypes.StopEdit
+);
+
 export const updateIng = createAction(
   ActionTypes.UpdateIngredient,
-  props<{index: number, newIngredient: Ingredient}>()
+  props<{newIngredient: Ingredient}>()
 );
 
 export const deleteIng = createAction(
-  ActionTypes.DeleteIngredients,
-  props<{index: number}>()
+  ActionTypes.DeleteIngredients
 );
