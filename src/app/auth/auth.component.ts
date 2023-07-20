@@ -5,7 +5,7 @@ import * as AuthAction from './store/auth.actions';
 import { AlertComponent } from '../shared/alert/alert.component';
 import { NgForm } from '@angular/forms';
 import { AuthResponseData, AuthService } from './auth.service';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { PlaceholderDirective } from '../shared/alert/placeholder.directive';
 
@@ -35,6 +35,9 @@ export class AuthComponent implements OnInit {
     this.store.select('auth').subscribe(authState => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
+      if (this.error) {
+        this.showAlert(this.error);
+      }
     })
   }
 
@@ -55,30 +58,12 @@ export class AuthComponent implements OnInit {
 
     this.isLoading = true;
     if (this.isLoginModeOn) {
-      // authObs = this.authService.login(email, password);
       this.store.dispatch(AuthAction.loginStart({ email: email, password: password }));
     } else {
       authObs = this.authService.signUp(email, password);
     }
     form.reset();
-    // authObs.subscribe({
-    //   next: (res) => {
-    //     console.log(res);
-    //     this.isLoading = false;
-    //     this.router.navigate(['/recipes']);
-    //   },
-    //   error: (errorMessage) => {
-    //     console.log(errorMessage);
-    //     // this.error = errorMessage;
-    //     this.showAlert(errorMessage);
-    //     this.isLoading = false;
-    //   }
-    // });
   }
-
-  // onHandleAlert() {
-  //   this.error = '';
-  // }
 
   private showAlert(errorMessage: string) {
     const alertCmpFactory = this.componentFactoryResolver.resolveComponentFactory(AlertComponent);

@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
 import { Actions, ofType, createEffect } from '@ngrx/effects';
-import { switchMap, catchError, map } from "rxjs/operators";
+import { switchMap, catchError, map, tap } from "rxjs/operators";
 import { of } from 'rxjs/internal/observable/of';
-import { ActionTypes, login, loginStart } from "./auth.actions";
+import { ActionTypes, login, loginFail } from "./auth.actions";
 import { environment } from "src/environments/environment";
 
 export interface AuthResponseData {
@@ -42,17 +43,45 @@ export class AuthEffects {
                   expDate: expDate
                 });
             }),
-            catchError(error => {
+            catchError((errorRes) => {
               // Map the error to an action
-              return of();
+              let errorMessage = 'An ukknown error occured. Please try again later.';
+              if (!errorRes.error || !errorRes.error.error) {
+                return of(loginFail({error: errorMessage}));
+              }
+              console.log('Error:', errorRes.error.error.message);
+              switch (errorRes.error.error.message) {
+                case 'EMAIL_EXISTS':
+                  errorMessage = 'This email alrede exists on our service. Plase try using a different one.';
+                  break;
+                case 'EMAIL_NOT_FOUND':
+                  errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
+                  break;
+                case 'INVALID_PASSWORD':
+                  errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
+                  break;
+              }
+              return of(loginFail({error: errorMessage}));
             })
           )
       }),
     )
   );
 
+  authSuccess = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ActionTypes.Login),
+        tap(() => {
+          this.router.navigate(['/recipes']);
+        })
+      ),
+    { dispatch: false }
+  );
+
   constructor(
     private actions$: Actions,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 }

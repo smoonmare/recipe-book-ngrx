@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 // Third-party modules
 import { Store } from '@ngrx/store';
 import { catchError, tap } from 'rxjs/operators';
-import { BehaviorSubject, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 
 // Application modules
 import { User } from './user.model';
@@ -30,7 +30,6 @@ export interface AuthResponseData {
   providedIn: 'root'
 })
 export class AuthService {
-  // user = new BehaviorSubject<User | null>(null);
   private tokenExpTimer: any;
 
   constructor(
@@ -86,7 +85,6 @@ export class AuthService {
   }
 
   logOut() {
-    // this.user.next(null);
     this.store.dispatch(AuthActions.logout());
     this.router.navigate(['auth']);
     localStorage.removeItem('userData');
@@ -129,7 +127,6 @@ export class AuthService {
           expDate: new Date(userData._tokenExpirationDate),
         })
       );
-      // this.user.next(loadedUser);
       this.autoLogOut(expirationDuration);
     }
   }
@@ -143,7 +140,6 @@ export class AuthService {
       expDate
     );
     this.autoLogOut(expiresIn * 1000);
-    // this.user.next(user);
     this.store.dispatch(
       AuthActions.login({
         email: email,
