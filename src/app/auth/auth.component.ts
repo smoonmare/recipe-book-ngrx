@@ -18,11 +18,11 @@ export class AuthComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   isLoginModeOn = true;
   isLoading = false;
+  error: string = '';
   @ViewChild(
     PlaceholderDirective,
-    {static: false}
+    { static: false }
   ) alertHost?: PlaceholderDirective;
-  // error = '';
 
   constructor(
     private store: Store<fromApp.AppState>,
@@ -32,6 +32,10 @@ export class AuthComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.store.select('auth').subscribe(authState => {
+      this.isLoading = authState.loading;
+      this.error = authState.authError;
+    })
   }
 
   ngOnDestroy(): void {
@@ -52,24 +56,24 @@ export class AuthComponent implements OnInit {
     this.isLoading = true;
     if (this.isLoginModeOn) {
       // authObs = this.authService.login(email, password);
-      this.store.dispatch(AuthAction.loginStart({email: email, password: password}));
+      this.store.dispatch(AuthAction.loginStart({ email: email, password: password }));
     } else {
       authObs = this.authService.signUp(email, password);
     }
-    authObs.subscribe({
-      next: (res) => {
-        console.log(res);
-        this.isLoading = false;
-        this.router.navigate(['/recipes']);
-      },
-      error: (errorMessage) => {
-        console.log(errorMessage);
-        // this.error = errorMessage;
-        this.showAlert(errorMessage);
-        this.isLoading = false;
-      }
-    });
     form.reset();
+    // authObs.subscribe({
+    //   next: (res) => {
+    //     console.log(res);
+    //     this.isLoading = false;
+    //     this.router.navigate(['/recipes']);
+    //   },
+    //   error: (errorMessage) => {
+    //     console.log(errorMessage);
+    //     // this.error = errorMessage;
+    //     this.showAlert(errorMessage);
+    //     this.isLoading = false;
+    //   }
+    // });
   }
 
   // onHandleAlert() {

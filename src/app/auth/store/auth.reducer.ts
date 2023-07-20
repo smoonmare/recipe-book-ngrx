@@ -4,14 +4,38 @@ import { User } from "../user.model";
 
 export interface State {
   user: User | null;
+  authError: string;
+  loading: boolean;
 }
 
 export const initialState: State = {
-  user: null
+  user: null,
+  authError: '',
+  loading: false
 }
 
 export const authReducer = createReducer(
   initialState,
+  on(
+    authActions.loginStart, (state) => {
+      return {
+        ...state,
+        authError: '',
+        loading: true
+      }
+    }
+  ),
+  on(
+    authActions.loginFail,
+    (state, action) => {
+      return {
+        ...state,
+        user: null,
+        authError: action.error,
+        loading: false
+      }
+    }
+  ),
   on(
     authActions.login,
     (state, action) => {
@@ -23,7 +47,7 @@ export const authReducer = createReducer(
       );
       return {
         ...state,
-        authError: null,
+        authError: '',
         user: user,
         loading: false
       };
