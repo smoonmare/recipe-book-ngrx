@@ -121,7 +121,14 @@ export class AuthService {
     );
     if (loadedUser.token) {
       const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
-      this.store.dispatch(AuthActions.login({user: loadedUser}));
+      this.store.dispatch(
+        AuthActions.login({
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expDate: new Date(userData._tokenExpirationDate),
+        })
+      );
       // this.user.next(loadedUser);
       this.autoLogOut(expirationDuration);
     }
@@ -137,7 +144,14 @@ export class AuthService {
     );
     this.autoLogOut(expiresIn * 1000);
     // this.user.next(user);
-    this.store.dispatch(AuthActions.login({user: user}));
+    this.store.dispatch(
+      AuthActions.login({
+        email: email,
+        userId: userID,
+        token: token,
+        expDate: expDate,
+      })
+    );
     localStorage.setItem('userData', JSON.stringify(user));
   }
 

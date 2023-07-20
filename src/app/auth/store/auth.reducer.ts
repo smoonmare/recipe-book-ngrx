@@ -13,10 +13,19 @@ export const initialState: State = {
 export const authReducer = createReducer(
   initialState,
   on(
-    authActions.login, (state, { user }) => {
+    authActions.login,
+    (state, action) => {
+      const user = new User(
+        action.email,
+        action.userId,
+        action.token,
+        action.expDate
+      );
       return {
         ...state,
-        user: user
+        authError: null,
+        user: user,
+        loading: false
       };
     }
   ),
