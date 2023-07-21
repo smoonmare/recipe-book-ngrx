@@ -32,13 +32,15 @@ export class AuthComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.store.select('auth').subscribe(authState => {
-      this.isLoading = authState.loading;
-      this.error = authState.authError;
-      if (this.error) {
-        this.showAlert(this.error);
-      }
-    })
+    this.subscriptions.push(
+      this.store.select('auth').subscribe(authState => {
+        this.isLoading = authState.loading;
+        this.error = authState.authError;
+        if (this.error) {
+          this.showAlert(this.error);
+        }
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -58,7 +60,7 @@ export class AuthComponent implements OnInit {
     if (this.isLoginModeOn) {
       this.store.dispatch(AuthAction.loginStart({ email: email, password: password }));
     } else {
-      this.store.dispatch(AuthAction.signUp({email: email, password: password}));
+      this.store.dispatch(AuthAction.signUp({ email: email, password: password }));
     }
     form.reset();
   }

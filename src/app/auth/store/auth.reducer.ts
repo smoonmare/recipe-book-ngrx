@@ -16,49 +16,53 @@ export const initialState: State = {
 
 export const authReducer = createReducer(
   initialState,
-  on(
-    authActions.loginStart, (state) => {
-      return {
-        ...state,
-        authError: '',
-        loading: true
-      }
+  on(authActions.signUp, (state) => {
+    return {
+      ...state,
+      authError: '',
+      loading: true
     }
-  ),
-  on(
-    authActions.authenticateFail,
-    (state, action) => {
-      return {
-        ...state,
-        user: null,
-        authError: action.error,
-        loading: false
-      }
+  }),
+  on(authActions.loginStart, (state) => {
+    return {
+      ...state,
+      authError: '',
+      loading: true
     }
-  ),
-  on(
-    authActions.authenticate,
-    (state, action) => {
-      const user = new User(
-        action.email,
-        action.userId,
-        action.token,
-        action.expDate
-      );
-      return {
-        ...state,
-        authError: '',
-        user: user,
-        loading: false
-      };
+  }),
+  on(authActions.authenticateFail, (state, action) => {
+    return {
+      ...state,
+      user: null,
+      authError: action.error,
+      loading: false
     }
-  ),
-  on(
-    authActions.logout, (state) => {
-      return {
-        ...state,
-        user: null
-      }
+  }),
+  on(authActions.authenticate, (state, action) => {
+    const user = new User(
+      action.email,
+      action.userId,
+      action.token,
+      action.expDate
+    );
+    return {
+      ...state,
+      authError: '',
+      user: user,
+      loading: false
+    };
+  }),
+  on(authActions.handleError, (state) => {
+    return {
+      ...state,
+      authError: ''
     }
+  }),
+  on(authActions.logout, (state) => {
+    return {
+      ...state,
+      user: null
+    }
+  }
   )
 );

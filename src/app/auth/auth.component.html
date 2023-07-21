@@ -1,60 +1,24 @@
 <ng-template appPlaceholder></ng-template>
 <div class="row">
   <div class="col-xs-12 col-md-6 col-md-offset">
-    <!-- <div class="alert alert-danger" *ngIf="error">
-      <p> {{ error }}</p>
-    </div> -->
-    <!-- <app-alert
-      [message]="error"
-      *ngIf="error"
-      (close)="onHandleAlert()"
-    ></app-alert> -->
     <div class="loading" *ngIf="isLoading">
       <app-loading></app-loading>
     </div>
-    <form
-      #authForm="ngForm"
-      (ngSubmit)="onSubmit(authForm)"
-      *ngIf="!isLoading"
-    >
+    <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)" *ngIf="!isLoading">
       <div class="form-group">
         <label for="email">E-mail:</label>
-        <input
-          type="email"
-          id="email"
-          class="form-control"
-          ngModel
-          name="email"
-          required
-          email
-        >
+        <input type="email" id="email" class="form-control" ngModel name="email" required email>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input
-          type="password"
-          autocomplete="on"
-          id="password"
-          class="form-control"
-          ngModel
-          name="password"
-          required
-          minlength="6"
-        >
+        <input type="password" autocomplete="on" id="password" class="form-control" ngModel name="password" required
+          minlength="6">
       </div>
       <div>
-        <button
-          class="btn btn-primary"
-          type="submit"
-          [disabled]="!authForm.valid"  
-        >
+        <button class="btn btn-primary" type="submit" [disabled]="!authForm.valid">
           {{ isLoginModeOn ? 'Login' : 'SignUp' }}
         </button> |
-        <button
-          class="btn btn-primary"
-          (click)="onSwithMode()"
-          type="button"
-        >
+        <button class="btn btn-primary" (click)="onSwithMode()" type="button">
           Switch to {{ isLoginModeOn ? 'SignUp' : 'Login' }}
         </button>
       </div>
