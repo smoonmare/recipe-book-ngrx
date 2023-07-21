@@ -120,7 +120,7 @@ export class AuthService {
     if (loadedUser.token) {
       const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
       this.store.dispatch(
-        AuthActions.login({
+        AuthActions.authenticate({
           email: loadedUser.email,
           userId: loadedUser.id,
           token: loadedUser.token,
@@ -141,7 +141,7 @@ export class AuthService {
     );
     this.autoLogOut(expiresIn * 1000);
     this.store.dispatch(
-      AuthActions.login({
+      AuthActions.authenticate({
         email: email,
         userId: userID,
         token: token,

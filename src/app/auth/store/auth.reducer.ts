@@ -26,7 +26,7 @@ export const authReducer = createReducer(
     }
   ),
   on(
-    authActions.loginFail,
+    authActions.authenticateFail,
     (state, action) => {
       return {
         ...state,
@@ -37,7 +37,7 @@ export const authReducer = createReducer(
     }
   ),
   on(
-    authActions.login,
+    authActions.authenticate,
     (state, action) => {
       const user = new User(
         action.email,

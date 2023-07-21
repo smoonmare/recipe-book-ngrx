@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { switchMap, catchError, map, tap } from "rxjs/operators";
 import { of } from 'rxjs/internal/observable/of';
-import { ActionTypes, login, loginFail } from "./auth.actions";
+import * as AuthActions from "./auth.actions";
+import { ActionTypes } from "./auth.actions";
 import { environment } from "src/environments/environment";
 
 export interface AuthResponseData {
@@ -16,38 +17,26 @@ export interface AuthResponseData {
   registered?: boolean
 }
 
-@Injectable()
-export class AuthEffects {
-  login$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ActionTypes.LoginStart),
-      switchMap((authData: {email: string, password: string}) => {
-        return this.http
-          .post<AuthResponseData>(
-            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.key}`,
-            {
-              email: authData.email,
-              password: authData.password,
-              returnSecureToken: true
-            }
-          ).pipe(
-            map(resData => {
-              // Map the response to an action
-              const expDate = new Date(
-                new Date().getTime() + +resData.expiresIn * 1000
-              );
-              return login({
-                  email: resData.email,
-                  userId: resData.localId,
-                  token: resData.idToken,
-                  expDate: expDate
-                });
-            }),
-            catchError((errorRes) => {
-              // Map the error to an action
-              let errorMessage = 'An ukknown error occured. Please try again later.';
+const handleAuth = (
+  email: string,
+  localId: string,
+  idToken: string,
+  expiresIn: number
+) => {
+  const expDate = new Date(
+    new Date().getTime() + +expiresIn * 1000
+  );
+  return AuthActions.authenticate({
+    email: email,
+    userId: localId,
+    token: idToken,
+    expDate: expDate
+  });
+};
+const handleError = (errorRes: HttpErrorResponse) => {
+  let errorMessage = 'An ukknown error occured. Please try again later.';
               if (!errorRes.error || !errorRes.error.error) {
-                return of(loginFail({error: errorMessage}));
+                return of(AuthActions.authenticateFail({ error: errorMessage }));
               }
               console.log('Error:', errorRes.error.error.message);
               switch (errorRes.error.error.message) {
@@ -61,7 +50,57 @@ export class AuthEffects {
                   errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
                   break;
               }
-              return of(loginFail({error: errorMessage}));
+              return of(AuthActions.authenticateFail({ error: errorMessage }));
+};
+
+@Injectable()
+export class AuthEffects {
+  signUp$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionTypes.SignUp),
+      switchMap((authData: { email: string, password: string }) => {
+        return this.http
+          .post<AuthResponseData>(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.key}`,
+            {
+              email: authData.email,
+              password: authData.password,
+              returnSecureToken: true
+            }
+          ).pipe(
+            map(resData => {
+              // Map the response to an action
+              return handleAuth(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
+            }),
+            catchError(errorRes => {
+              // Map the error to an action
+              return handleError(errorRes);
+            })
+          )
+      }),
+    )
+  );
+
+  login$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionTypes.LoginStart),
+      switchMap((authData: { email: string, password: string }) => {
+        return this.http
+          .post<AuthResponseData>(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.key}`,
+            {
+              email: authData.email,
+              password: authData.password,
+              returnSecureToken: true
+            }
+          ).pipe(
+            map(resData => {
+              // Map the response to an action
+              return handleAuth(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
+            }),
+            catchError((errorRes) => {
+              // Map the error to an action
+              return handleError(errorRes);
             })
           )
       }),
@@ -71,7 +110,7 @@ export class AuthEffects {
   authSuccess = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(ActionTypes.Login),
+        ofType(ActionTypes.Authenticate),
         tap(() => {
           this.router.navigate(['/recipes']);
         })
