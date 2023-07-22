@@ -3,8 +3,9 @@ import { createAction, props } from '@ngrx/store';
 export enum ActionTypes {
   SignUp = '[Auth Component] SIGN_UP',
   LoginStart = '[Auth Component] LOGIN_START',
+  AutoLogin = '[Auth Component] AUTO_LOGIN',
   AuthenticateFail = '[Auth Component] AUTHENTICATE_FAIL',
-  Authenticate = '[Auth Component] AUTHENTICATE_SUCCESS',
+  AuthenticateSuccess = '[Auth Component] AUTHENTICATE_SUCCESS',
   Logout = '[Auth Component] LOGOUT',
   HandleError = '[Auth Component] HANDLE_ERROR'
 }
@@ -19,13 +20,17 @@ export const loginStart = createAction(
   props<{ email: string, password: string }>()
 );
 
+export const autoLogin = createAction(
+  ActionTypes.AutoLogin
+);
+
 export const authenticateFail = createAction(
   ActionTypes.AuthenticateFail,
   props<{ error: string }>()
 )
 
 export const authenticate = createAction(
-  ActionTypes.Authenticate,
+  ActionTypes.AuthenticateSuccess,
   props<{
     email: string;
     userId: string;

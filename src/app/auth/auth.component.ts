@@ -26,8 +26,6 @@ export class AuthComponent implements OnInit {
 
   constructor(
     private store: Store<fromApp.AppState>,
-    private authService: AuthService,
-    private router: Router,
     private componentFactoryResolver: ComponentFactoryResolver
   ) { }
 

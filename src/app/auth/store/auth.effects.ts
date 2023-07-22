@@ -7,6 +7,7 @@ import { of } from 'rxjs/internal/observable/of';
 import * as AuthActions from "./auth.actions";
 import { ActionTypes } from "./auth.actions";
 import { environment } from "src/environments/environment";
+import { User } from "../user.model";
 
 export interface AuthResponseData {
   idToken: string,
@@ -26,6 +27,8 @@ const handleAuth = (
   const expDate = new Date(
     new Date().getTime() + +expiresIn * 1000
   );
+  const user = new User(email, localId, idToken, expDate);
+  localStorage.setItem('userData', JSON.stringify(user));
   return AuthActions.authenticate({
     email: email,
     userId: localId,
@@ -35,26 +38,31 @@ const handleAuth = (
 };
 const handleError = (errorRes: HttpErrorResponse) => {
   let errorMessage = 'An ukknown error occured. Please try again later.';
-              if (!errorRes.error || !errorRes.error.error) {
-                return of(AuthActions.authenticateFail({ error: errorMessage }));
-              }
-              console.log('Error:', errorRes.error.error.message);
-              switch (errorRes.error.error.message) {
-                case 'EMAIL_EXISTS':
-                  errorMessage = 'This email alrede exists on our service. Plase try using a different one.';
-                  break;
-                case 'EMAIL_NOT_FOUND':
-                  errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
-                  break;
-                case 'INVALID_PASSWORD':
-                  errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
-                  break;
-              }
-              return of(AuthActions.authenticateFail({ error: errorMessage }));
+  if (!errorRes.error || !errorRes.error.error) {
+    return of(AuthActions.authenticateFail({ error: errorMessage }));
+  }
+  console.log('Error:', errorRes.error.error.message);
+  switch (errorRes.error.error.message) {
+    case 'EMAIL_EXISTS':
+      errorMessage = 'This email already exists on our service. Please try again using a different one.';
+      break;
+    case 'EMAIL_NOT_FOUND':
+    case 'INVALID_PASSWORD':
+      errorMessage = 'Invalid crenedtials. Please try with a different credentials or simply Sign Up.';
+      break;
+  }
+  return of(AuthActions.authenticateFail({ error: errorMessage }));
 };
 
 @Injectable()
 export class AuthEffects {
+
+  constructor(
+    private actions$: Actions,
+    private http: HttpClient,
+    private router: Router
+  ) { }
+
   signUp$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ActionTypes.SignUp),
@@ -107,20 +115,59 @@ export class AuthEffects {
     )
   );
 
-  authSuccess = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(ActionTypes.Authenticate),
-        tap(() => {
-          this.router.navigate(['/recipes']);
-        })
-      ),
+  authSuccess = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionTypes.AuthenticateSuccess),
+      tap(() => {
+        this.router.navigate(['/recipes']);
+      })
+    ),
     { dispatch: false }
   );
 
-  constructor(
-    private actions$: Actions,
-    private http: HttpClient,
-    private router: Router
-  ) { }
+  autoLogin = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionTypes.AutoLogin),
+      map(() => {
+        const storedData = localStorage.getItem('userData');
+        if (!storedData) {
+          return { type: 'NO_ACTION' };
+        }
+        const userData: {
+          email: string,
+          id: string,
+          _token: string,
+          _tokenExpirationDate: string
+        } = JSON.parse(storedData);
+        const loadedUser = new User(
+          userData.email,
+          userData.id,
+          userData._token,
+          new Date(userData._tokenExpirationDate)
+        );
+        if (loadedUser.token) {
+          return AuthActions.authenticate({
+            email: loadedUser.email,
+            userId: loadedUser.id,
+            token: loadedUser.token,
+            expDate: new Date(userData._tokenExpirationDate),
+          });
+          // const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
+          // this.autoLogOut(expirationDuration);
+        }
+        return { type: 'NO_ACTION' };
+      })
+    )
+  );
+
+  authLogout = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionTypes.Logout),
+      tap(() => {
+        localStorage.removeItem('userData');
+      })
+    ),
+    { dispatch: false }
+  );
+
 }
