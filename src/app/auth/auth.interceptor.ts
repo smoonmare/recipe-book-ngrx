@@ -8,7 +8,6 @@ import {
   HttpInterceptor,
   HttpParams
 } from '@angular/common/http';
-import { AuthService } from './auth.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { exhaustMap, take, map } from 'rxjs/operators';
 
@@ -16,7 +15,6 @@ import { exhaustMap, take, map } from 'rxjs/operators';
 export class AuthInterceptor implements HttpInterceptor {
 
   constructor(
-    private authService: AuthService,
     private store: Store<fromApp.AppState>
   ) {}
 

@@ -8,6 +8,7 @@ import * as AuthActions from "./auth.actions";
 import { ActionTypes } from "./auth.actions";
 import { environment } from "src/environments/environment";
 import { User } from "../user.model";
+import { AuthService } from "../auth.service";
 
 export interface AuthResponseData {
   idToken: string,
@@ -58,6 +59,7 @@ const handleError = (errorRes: HttpErrorResponse) => {
 export class AuthEffects {
 
   constructor(
+    private authService: AuthService,
     private actions$: Actions,
     private http: HttpClient,
     private router: Router
@@ -102,6 +104,9 @@ export class AuthEffects {
               returnSecureToken: true
             }
           ).pipe(
+            tap(resData => {
+              this.authService.setLogoutTimer(+resData.expiresIn * 1000);
+            }),
             map(resData => {
               // Map the response to an action
               return handleAuth(resData.email, resData.localId, resData.idToken, +resData.expiresIn);
@@ -146,14 +151,14 @@ export class AuthEffects {
           new Date(userData._tokenExpirationDate)
         );
         if (loadedUser.token) {
+          const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
+          this.authService.setLogoutTimer(expirationDuration);
           return AuthActions.authenticate({
             email: loadedUser.email,
             userId: loadedUser.id,
             token: loadedUser.token,
             expDate: new Date(userData._tokenExpirationDate),
           });
-          // const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
-          // this.autoLogOut(expirationDuration);
         }
         return { type: 'NO_ACTION' };
       })
@@ -164,7 +169,9 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(ActionTypes.Logout),
       tap(() => {
+        this.authService.clearLogoutTimer();
         localStorage.removeItem('userData');
+        this.router.navigate(['/auth']);
       })
     ),
     { dispatch: false }
