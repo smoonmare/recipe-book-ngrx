@@ -6,11 +6,11 @@ import * as fromRecipe from '../recipe-book/store/recipe.reducer';
 export interface AppState {
   shoppingList: fromShoppingList.State;
   auth: fromAuth.State;
-  recipe: fromRecipe.State;
+  recipes: fromRecipe.State;
 }
 
 export const appReducer: ActionReducerMap<AppState> = {
   shoppingList: fromShoppingList.shoppingListReducer,
   auth: fromAuth.authReducer,
-  recipe: fromRecipe.recipeReducer
+  recipes: fromRecipe.recipeReducer
 };
