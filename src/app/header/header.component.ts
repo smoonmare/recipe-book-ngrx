@@ -4,7 +4,6 @@ import * as fromApp from '../store/app.reducer';
 import * as AuthActions from '../auth/store/auth.actions';
 import * as RecipeActions from '../recipe-book/store/recipe.actions';
 import { map } from 'rxjs/operators';
-import { DataStorageService } from '../shared/data-storage.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -17,7 +16,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private dataStorageService: DataStorageService,
     private store: Store<fromApp.AppState>
   ) { }
 
@@ -39,7 +37,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onSaveData() {
-    this.dataStorageService.storeRecipes();
+    this.store.dispatch(RecipeActions.storeRecipes());
   }
 
   onFetchData() {
