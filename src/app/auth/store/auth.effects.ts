@@ -34,7 +34,8 @@ const handleAuth = (
     email: email,
     userId: localId,
     token: idToken,
-    expDate: expDate
+    expDate: expDate,
+    redirect: true
   });
 };
 const handleError = (errorRes: HttpErrorResponse) => {
@@ -87,7 +88,7 @@ export class AuthEffects {
               return handleError(errorRes);
             })
           )
-      }),
+      })
     )
   );
 
@@ -120,11 +121,13 @@ export class AuthEffects {
     )
   );
 
-  authSuccess = createEffect(() =>
+  authRedirect = createEffect(() =>
     this.actions$.pipe(
-      ofType(ActionTypes.AuthenticateSuccess),
-      tap(() => {
-        this.router.navigate(['/recipes']);
+      ofType(AuthActions.authenticate),
+      tap((authSuccessAction) => {
+        if (authSuccessAction.redirect) {
+          this.router.navigate(['/recipes']);
+        }
       })
     ),
     { dispatch: false }
@@ -158,6 +161,7 @@ export class AuthEffects {
             userId: loadedUser.id,
             token: loadedUser.token,
             expDate: new Date(userData._tokenExpirationDate),
+            redirect: false
           });
         }
         return { type: 'NO_ACTION' };

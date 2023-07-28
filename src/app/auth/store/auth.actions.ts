@@ -36,6 +36,7 @@ export const authenticate = createAction(
     userId: string;
     token: string;
     expDate: Date;
+    redirect: boolean
   }>()
 );
 

@@ -14,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import * as fromApp from '../app/store/app.reducer';
 import { AuthEffects } from './auth/store/auth.effects';
+import { RecipeEffects } from './recipe-book/store/recipe.effects';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { AuthEffects } from './auth/store/auth.effects';
     AppRoutingModule,
     StoreModule.forRoot(fromApp.appReducer),
     EffectsModule.forRoot([
-      AuthEffects
+      AuthEffects,
+      RecipeEffects
     ]),
     ReactiveFormsModule,
     CoreModule,
