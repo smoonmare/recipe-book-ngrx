@@ -17,5 +17,31 @@ export const recipeReducer = createReducer(
       ...state,
       recipes: action.recipes
     }
+  }),
+  on(recipesActions.addRecipe, (state, action) => {
+    return {
+      ...state,
+      recipe: action.recipe
+    }
+  }),
+  on(recipesActions.updateRecipe, (state, action) => {
+    const updatedRecipe = {
+      ...state.recipes[action.index],
+      ...action.newRecipe
+    };
+    const updatedRecipes = [...state.recipes];
+    updatedRecipes[action.index] = updatedRecipe;
+    return {
+      ...state,
+      recipes: updatedRecipes
+    }
+  }),
+  on(recipesActions.deleteRecipe, (state, action) => {
+    return {
+      ...state,
+      recipes: state.recipes.filter((recipe, index) => {
+        return index !== action.index;
+      })
+    }
   })
 )
